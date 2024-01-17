@@ -1,0 +1,84 @@
+﻿@page "/editWindows"
+@page "/editWindows/{id:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@if(Id is null)
+{
+    <PageTitle>Create new Window</PageTitle>
+    <h3>Create a new window</h3>
+}
+else
+{
+    <PageTitle>Edit @window.Name</PageTitle>
+    <h3>Edit @window.Name</h3>
+}
+
+<EditForm Model="window" OnSubmit="HandleSubmit">
+    <div>
+        <label for="name">Name</label>
+        <InputText id="name" @bind-Value="window.Name" class="form-control" />
+    </div>
+    <div>
+        <label for="order-text">OrderId</label>
+        <InputNumber id="order-text" @bind-Value="window.OrderId" class="form-control" />
+    </div>
+    <div>
+        <label for="order-text">Name</label>
+        <InputText id="order-text" @bind-Value="window.Name" class="form-control" />
+    </div>
+    <div>
+        <label for="order-text">QuanitityOfWindows</label>
+        <InputNumber id="order-text" @bind-Value="window.QuantityOfWindows" class="form-control" />
+    </div>
+    <div>
+        <label for="order-text">TotalSubElements</label>
+        <InputNumber id="order-text" @bind-Value="window.TotalSubElements" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    @if (Id is not null)
+    {
+        <button type="button" class="btn btn-danger" @onclick="DeleteWindow">Delete</button>
+    }
+
+</EditForm>
+
+
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    Window window = new Window { Id = 1, OrderId = 1, Name = "testWindow", QuantityOfWindows = 3, TotalSubElements = 2, };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var result = await Http.GetFromJsonAsync<Window>($"api/window/{Id}");
+            if (result is not null)
+            {
+                window = result;
+            }
+        }
+    }
+
+    async Task DeleteWindow()
+    {
+        await Http.DeleteAsync($"api/window/{Id}");
+        NavigationManager.NavigateTo("/window");
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id is null)
+        {
+            await Http.PostAsJsonAsync("api/window", window);
+            NavigationManager.NavigateTo("/window");
+        } else
+        {
+            await Http.PutAsJsonAsync($"api/window/{Id}", window);
+            NavigationManager.NavigateTo("/window");
+        }
+    }
+}

@@ -1,0 +1,49 @@
+﻿@page "/window"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<PageTitle>Window</PageTitle>
+
+<h3>Windows</h3>
+
+<button @onclick="AddWindow" class="btn btn-primary">Add Window</button>
+
+@if(windows.Count <= 0)
+{
+    <span>Loading Windows...</span>
+} else
+{
+    <QuickGrid Items="windows.AsQueryable()">
+        <PropertyColumn Property="window => window.Name" />
+        <PropertyColumn Property="window => window.OrderId" />
+        <PropertyColumn Property="window => window.QuantityOfWindows" />
+        <PropertyColumn Property="window => window.TotalSubElements" />
+        <TemplateColumn>
+            <button @onclick="(() => EditWindow(context.Id))" class="btn btn-primary">Edit Window</button>
+        </TemplateColumn>
+    </QuickGrid>
+}
+
+@code {
+    public List<Window> windows = new List<Window>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        List<Window> result = await Http.GetFromJsonAsync<List<Window>>("api/window");
+        Console.WriteLine(result);
+        if (result != null)
+        {
+            windows = result;
+        }
+    }
+
+    void AddWindow()
+    {
+        NavigationManager.NavigateTo("/editWindows");
+    }
+
+    void EditWindow(int id)
+    {
+        NavigationManager.NavigateTo($"/editWindows/{id}");
+    }
+}

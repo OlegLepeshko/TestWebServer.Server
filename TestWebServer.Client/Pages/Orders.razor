@@ -1,0 +1,54 @@
+﻿@page "/order"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<PageTitle>Order</PageTitle>
+
+<h3>Orders</h3>
+
+<button @onclick="AddOrder" class="btn btn-primary">Add Order</button>
+
+@if(orders.Count <= 0)
+{
+    <span>Loading orders...</span>
+} else
+{
+    <QuickGrid Items="orders.AsQueryable()">
+        <PropertyColumn Property="order => order.Name" />
+        <PropertyColumn Property="order => order.State" />
+        <TemplateColumn>
+            <button @onclick="(() => EditOrder(context.Id))" class="btn btn-primary">Edit Order</button>
+        </TemplateColumn>
+    </QuickGrid>
+   @*  <ul>
+        @foreach (var order in orders)
+        {
+            <li>@order.Id - @order.Name</li>
+        }
+    </ul> *@
+}
+
+@code {
+    public List<Order> orders = new List<Order>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        List<Order> result = await Http.GetFromJsonAsync<List<Order>>("api/Order");
+        Console.WriteLine(result);
+        if (result != null)
+        {
+            orders = result;
+            Console.WriteLine(orders);
+        }
+    }
+
+    void AddOrder()
+    {
+        NavigationManager.NavigateTo("/editOrders");
+    }
+
+    void EditOrder(int id)
+    {
+        NavigationManager.NavigateTo($"/editOrders/{id}");
+    }
+}

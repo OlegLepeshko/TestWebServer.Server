@@ -1,0 +1,19 @@
+@TestWebServer.Server_HostAddress = https://localhost:7067
+
+GET {{TestWebServer.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+GET {{TestWebServer.Server_HostAddress}}/api/order
+
+###
+
+POST {{TestWebServer.Server_HostAddress}}/api/order
+Content-Type: application/json
+
+{
+  //Order
+}
+
+###

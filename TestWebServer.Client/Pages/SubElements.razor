@@ -1,0 +1,52 @@
+﻿@page "/subElement"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<PageTitle>SubElement</PageTitle>
+
+<h3>SubElements</h3>
+
+<button @onclick="AddSubElement" class="btn btn-primary">Add SubElement</button>
+
+@if (subElements.Count <= 0)
+{
+    <span>Loading SubElements...</span>
+}
+else
+{
+    <QuickGrid Items="subElements.AsQueryable()">
+        <PropertyColumn Property="subElement => subElement.WindowId" />
+        <PropertyColumn Property="subElement => subElement.Element" />
+        <PropertyColumn Property="subElement => subElement.Type" />
+        <PropertyColumn Property="subElement => subElement.Width" />
+        <PropertyColumn Property="subElement => subElement.Height" />
+        <TemplateColumn>
+            <button @onclick="(() => EditSubElement(context.Id))" class="btn btn-primary">Edit SubElements</button>
+        </TemplateColumn>
+    </QuickGrid>
+}
+
+@code {
+    public List<SubElement> subElements = new List<SubElement>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        List<SubElement> result = await Http.GetFromJsonAsync<List<SubElement>>("api/subElement");
+        Console.WriteLine(result);
+        if (result != null)
+        {
+            subElements = result;
+        }
+    }
+
+    void AddSubElement()
+    {
+        NavigationManager.NavigateTo("/editSubElements");
+    }
+
+    void EditSubElement(int id)
+    {
+        NavigationManager.NavigateTo($"/editSubElements/{id}");
+    }
+}
+

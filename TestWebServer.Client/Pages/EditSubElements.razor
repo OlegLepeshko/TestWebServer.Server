@@ -1,0 +1,81 @@
+﻿@page "/editSubElements"
+@page "/editSubElements/{id:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@if(Id is null)
+{
+    <PageTitle>Create new SubElement</PageTitle>
+    <h3>Create a new subElement</h3>
+}
+else
+{
+    <PageTitle>Edit @subElement.Type</PageTitle>
+    <h3>Edit @subElement.Type</h3>
+}
+
+<EditForm Model="subElement" OnSubmit="HandleSubmit">
+    <div>
+        <label for="order-text">WindowId</label>
+        <InputNumber id="order-text" @bind-Value="subElement.WindowId" class="form-control" />
+    </div>
+    <div>
+        <label for="order-text">Element</label>
+        <InputNumber id="order-text" @bind-Value="subElement.Element" class="form-control" />
+    </div>
+    <div>
+        <label for="order-text">Type</label>
+        <InputText id="order-text" @bind-Value="subElement.Type" class="form-control" />
+    </div>
+    <div>
+        <label for="order-text">Width</label>
+        <InputNumber id="order-text" @bind-Value="subElement.Width" class="form-control" />
+    </div><div>
+        <label for="order-text">Height</label>
+        <InputNumber id="order-text" @bind-Value="subElement.Height" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    @if (Id is not null)
+    {
+        <button type="button" class="btn btn-danger" @onclick="DeleteSubElement">Delete</button>
+    }
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    SubElement subElement = new SubElement { Id = 1, WindowId = 1, Element = 2, Type = "testType", Width = 10, Height = 20 };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var result = await Http.GetFromJsonAsync<SubElement>($"api/subElement/{Id}");
+            if (result is not null)
+            {
+                subElement = result;
+            }
+        }
+    }
+
+    async Task DeleteSubElement()
+    {
+        await Http.DeleteAsync($"api/subElement/{Id}");
+        NavigationManager.NavigateTo("/subElement");
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id is null)
+        {
+            await Http.PostAsJsonAsync("api/subElement", subElement);
+            NavigationManager.NavigateTo("/subElement");
+        } else
+        {
+            await Http.PutAsJsonAsync($"api/subElement/{Id}", subElement);
+            NavigationManager.NavigateTo("/subElement");
+        }
+    }
+}
